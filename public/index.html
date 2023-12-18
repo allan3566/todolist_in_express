@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo List</title>
+<style>
+  .completed {
+    text-decoration: line-through;
+  }
+</style>
+</head>
+<body>
+
+<h2>My Todo Liste</h2>
+
+<input type="text" id="new-task" placeholder="What do you need to do?">
+<button onclick="addTask()">Add Task</button>
+
+<ul id="task-list">
+  <!-- Tasks will go here -->
+</ul>
+
+<script>
+// The state of our task list
+const state = {
+  tasks: []
+};
+
+// Function to render the task list
+function render() {
+    fetch('/render').then(res=>res.json()).then(data=>console.log(data));
+
+}
+
+// Function to add a task
+function addTask() {
+  const newTaskElement = document.getElementById('new-task');
+  if (newTaskElement.value.trim() !== '') {
+
+    state.tasks.push({ text: newTaskElement.value, completed: false });
+    newTaskElement.value = ''; // Clear the input
+    const options = {
+        method: 'POST',
+        body: JSON.stringify({ newTaskElement }),
+        headers: new Headers({ 'Content-Type': 'application/json' })
+    }
+    console.log('options');
+    console.log(options);
+    fetch('/add', options).then(console.log('succ'))
+    render();
+  }
+  
+}
+
+// Function to toggle task completion
+function toggleTaskCompletion(taskIndex) {
+  state.tasks[taskIndex].completed = !state.tasks[taskIndex].completed;
+  render();
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
