@@ -52,7 +52,7 @@ function addTask() {
         body: JSON.stringify({ newTaskElement }),
         headers: new Headers({ 'Content-Type': 'application/json' })
     }
-    fetch('/add', options).then()
+    fetch('/add', options).then(console.log('add_succ')).catch('add_failed')
     document.getElementById('new-task').value = ''; // Clear the input
     render();
   }
@@ -64,7 +64,10 @@ function toggleTaskCompletion(taskIndex) {
   render();
 }
 
+
+
 // Initial render
+
 render();
 </script>
 </body>
