@@ -28,29 +28,34 @@ const state = {
 };
 
 // Function to render the task list
-function render() {
-    fetch('/render').then(res=>res.json()).then(data=>console.log(data));
-
+async function render() {
+    const taskListElement = document.getElementById('task-list');
+    // Clear the current task list
+    taskListElement.innerHTML = '';
+    let state;
+    const res = await fetch('/render');
+    state = await res.json();
+    state.tasks.forEach((task, index) => {
+        const taskElement = document.createElement('li');
+        taskElement.textContent = task.text;
+        taskListElement.appendChild(taskElement);
+      });
 }
 
 // Function to add a task
 function addTask() {
-  const newTaskElement = document.getElementById('new-task');
-  if (newTaskElement.value.trim() !== '') {
-
-    state.tasks.push({ text: newTaskElement.value, completed: false });
-    newTaskElement.value = ''; // Clear the input
+  const newTaskElement = document.getElementById('new-task').value;
+  if (newTaskElement.trim() !== '') {
+    state.tasks.push({ text: newTaskElement, completed: false });
     const options = {
         method: 'POST',
         body: JSON.stringify({ newTaskElement }),
         headers: new Headers({ 'Content-Type': 'application/json' })
     }
-    console.log('options');
-    console.log(options);
-    fetch('/add', options).then(console.log('succ'))
+    fetch('/add', options).then()
+    document.getElementById('new-task').value = ''; // Clear the input
     render();
   }
-  
 }
 
 // Function to toggle task completion

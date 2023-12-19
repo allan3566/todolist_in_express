@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-let tasks = ['fff'];
+const state = {
+  tasks: []
+};
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -9,14 +11,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/render', function(req, res, next) {
-  res.json(tasks);
+  res.json(state);
 });
 
 router.post('/add', function(req, res, next) {
-  var n = req.body;
-  tasks.push({text:n});
-  res.json(tasks);
-  console.log(tasks);
+  var n = req.body.newTaskElement;
+  state.tasks.push({text:n});
+  console.log(state.tasks);
 });
 
 module.exports = router;
