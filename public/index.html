@@ -31,7 +31,7 @@ add.addEventListener('click',(e)=>{
   addTask();
 })
 
-// Function to render the task list
+// Function to render the task list   the delete fucntion only happen in front side by design the func in item when create
 async function render() {
     const taskListElement = document.getElementById('task-list');
     // Clear the current task list
@@ -48,6 +48,13 @@ async function render() {
     state.tasks.forEach((task, index) => {
         const taskElement = document.createElement('li');
         taskElement.textContent = task.text;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        taskElement.appendChild(deleteBtn);
+        deleteBtn.addEventListener('click', function () {
+        taskListElement.removeChild(taskElement);
+        });
         taskListElement.appendChild(taskElement);
       });
 }
@@ -64,6 +71,9 @@ function addTask() {
     }
     fetch('/add', options).then(console.log('add_succ')).catch('add_failed')
     document.getElementById('new-task').value = ''; // Clear the input
+
+
+
     render();
   }
 }
