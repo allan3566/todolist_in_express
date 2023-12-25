@@ -26,6 +26,7 @@
 const state = {
   tasks: []
 };
+const {tasks} = state
 const add = document.getElementById('addTaskbtn');
 add.addEventListener('click',(e)=>{ 
   addTask();
@@ -36,14 +37,12 @@ async function render() {
     const taskListElement = document.getElementById('task-list');
     // Clear the current task list
     taskListElement.innerHTML = '';
-    let res = await fetch('/render' ,{
-      headers: {
-         "Content-Type": "application/json",
-         "Accept": "application/json"
-      },
-      method: "POST",
-      body:"",
-    });
+    const renderoptions = {
+      method: 'POST',
+      body: '',
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    }
+    let res = await fetch('/render' ,renderoptions);
     let state = await res.json();
     state.tasks.forEach((task, index) => {
         const taskElement = document.createElement('li');
@@ -51,10 +50,12 @@ async function render() {
         
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
-        taskElement.appendChild(deleteBtn);
+        
         deleteBtn.addEventListener('click', function () {
-        taskListElement.removeChild(taskElement);
+          deleteTask(task.id);
+          //taskListElement.removeChild(taskElement);
         });
+        taskElement.appendChild(deleteBtn);
         taskListElement.appendChild(taskElement);
       });
 }
@@ -63,20 +64,40 @@ async function render() {
 function addTask() {
   const newTaskElement = document.getElementById('new-task').value;
   if (newTaskElement.trim() !== '') {
-    state.tasks.push({ text: newTaskElement, completed: false });
-    const options = {
+    const taskId = newTaskElement;
+    state.tasks.push({ id : taskId, text: newTaskElement, completed: false });
+    const addoptions = {
         method: 'POST',
-        body: JSON.stringify({ newTaskElement }),
+        body: JSON.stringify({ id : taskId, text : newTaskElement }),
         headers: new Headers({ 'Content-Type': 'application/json' })
     }
-    fetch('/add', options).then(console.log('add_succ')).catch('add_failed')
+    fetch('/add', addoptions).then(console.log('add_succ')).catch('add_failed')
     document.getElementById('new-task').value = ''; // Clear the input
-
-
-
     render();
   }
 }
+
+async function deleteTask(taskId) {
+  //設定Tasks array中的元素有符合taskId者為taskIndex
+  const taskIndex = tasks.findIndex((task) => task.id === taskId);
+  //如果陣列中存有該元素,也就是index可能是0,1,2,3...
+  if (taskIndex > -1) {
+    tasks.splice(taskIndex, 1);
+    try {
+      //等待發出delete request
+      const response = await fetch('/delete', {
+        method: "POST",
+      });
+      //解析delete response
+      const data = await response.json();
+      console.log("Success:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+  render();
+}
+
 
 // Function to toggle task completion
 function toggleTaskCompletion(taskIndex) {
