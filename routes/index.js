@@ -17,26 +17,23 @@ router.post('/render', function(req, res, next) {
 
 // add 
 router.post('/add', function(req, res, next) {
-  var n = req.body.text;
+  const n = req.body.text;
   state.tasks.push({text:n});
-  console.log(state.tasks);
+  res.json({ message: "node-add succ", task: state.tasks });
+  console.log({ message: "node-add succ", task: state.tasks });
 });
 // delete 
-router.post("/delete", (req, res, next) => {
-  console.log('aerg')
-  const taskId = parseInt(req.params.taskId);
-  if (isNaN(taskId)) {
-    return res.status(400).json({ error: "任務id無效" });
-  }
-  const taskIndex = tasks.findIndex((task) => task.id === taskId);
-
-  if (taskIndex > -1) {
-    const taskText = tasks[taskIndex].text;
-    tasks.splice(taskIndex, 1);
-    res.json({ message: "任務刪除成功", taskId: taskId, text: taskText });
-    console.log({ message: "任務刪除成功", taskId: taskId, text: taskText });
+router.post('/del', (req, res, next) => {
+  const n = req.body.id;
+  const taskIndex = state.tasks.findIndex((tasks) => tasks.text === n);
+  
+  if (taskIndex!==-1) {
+    state.tasks.splice(taskIndex, 1);
+    res.json({ message: "node-del succ", taskId: n });
+    console.log({ message: "node-del succ", taskId: n });
   } else {
-    res.status(404).json({ error: "無相同任務與此ID匹配" });
+    res.status(404).json({ error: "can't find ID" });
   }
+  
 });
 module.exports = router;
