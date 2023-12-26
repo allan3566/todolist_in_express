@@ -23,14 +23,12 @@
 
 <script>
 // The state of our task list
-const state = {
-  tasks: []
-};
-const {tasks} = state
 const add = document.getElementById('addTaskbtn');
 add.addEventListener('click',(e)=>{ 
   addTask();
 })
+// Initial render
+render();
 
 // Function to render the task list   the delete fucntion only happen in front side by design the func in item when create
 async function render() {
@@ -55,6 +53,15 @@ async function render() {
           deleteTask(task.text);
           //taskListElement.removeChild(taskElement);
         });
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.id = "e-"+task.text;
+        editBtn.addEventListener('click', function () {
+          editTask("e-"+task.text);
+          //taskListElement.removeChild(taskElement);
+        });
+        taskElement.appendChild(editBtn);
         taskElement.appendChild(deleteBtn);
         taskListElement.appendChild(taskElement);
       });
@@ -90,22 +97,36 @@ async function deleteTask(taskId) {
     }catch (error) {
       console.log(`Error: ${error}`);
     }
-    
   render();
 }
 
 
+async function editTask(taskId) {
+  try {
+    //delete api by post request
+    const editoptions = {
+      method: 'POST',
+      body: JSON.stringify({ id : taskId}),
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    };
+    const response = await fetch('/edit', editoptions);
+    let data = await response.json();
+    console.log(data);
+  }catch (error) {
+    console.log(`Error: ${error}`);
+  }
+render();
+}
+/*
 // Function to toggle task completion
 function toggleTaskCompletion(taskIndex) {
   state.tasks[taskIndex].completed = !state.tasks[taskIndex].completed;
   render();
 }
+*/
 
 
 
-// Initial render
-
-render();
 </script>
 </body>
 </html>
